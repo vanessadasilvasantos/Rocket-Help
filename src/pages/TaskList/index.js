@@ -9,43 +9,12 @@ import {
   TextInput,
 } from "react-native";
 import Home from "../home";
-import Finalizacao, { handleAddFin } from "../finalizacao";
+
 import { useNavigation } from "@react-navigation/native";
 
 export default function TaskList({ data, dataDesc, handleDelete }) {
   const navigation = useNavigation();
-  const [task, setTask] = useState([]);
   const [open, setOpen] = useState(false);
-  const [number, setNumber] = useState("");
-  const [desc, setDesc] = useState("");
-
-  function handleAdd() {
-    if (number === "" && desc === "") return;
-
-    const data = {
-      key: number,
-      numberTask: number,
-      descText: desc,
-    };
-
-    setTask([...task, data]);
-    setOpen(false);
-    setNumber("");
-  }
-
-  function handleAddFin() {
-    if (number === "" && desc === "") return;
-
-    const dataFin = {
-      key: number,
-      numberTask: number,
-      descText: desc,
-    };
-
-    setTask([...task, dataFin]);
-    setOpen(false);
-    setNumber("");
-  }
 
   return (
     <View>
@@ -97,6 +66,7 @@ export default function TaskList({ data, dataDesc, handleDelete }) {
               placeholder="Descrição do problema"
               placeholderTextColor={"#7C7C8A"}
               value={data.descText}
+              //  onChangeText={(texto) => Home.setDesc(texto)}
             />
           </View>
           <View style={styles.inputContainerDesc}>
@@ -111,13 +81,7 @@ export default function TaskList({ data, dataDesc, handleDelete }) {
             />
           </View>
           <View>
-            <TouchableOpacity
-              style={styles.buttonContainer}
-              onPress={() => {
-                navigation.navigate("Finalizacao");
-                handleDelete(data);
-              }}
-            >
+            <TouchableOpacity style={styles.buttonContainer} onPress={() => {}}>
               <Text style={styles.buttonRequest}>Finalizar</Text>
             </TouchableOpacity>
           </View>

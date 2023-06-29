@@ -8,29 +8,15 @@ import {
   Image,
   TextInput,
 } from "react-native";
-import Finalizacao from "../finalizacao";
+
 import { useNavigation } from "@react-navigation/native";
 
-export default function TaskListFin({ dataFin, dataDesc }) {
+export default function TaskListFin({ data, dataDesc }) {
   const navigation = useNavigation();
   const [task, setTask] = useState([]);
   const [open, setOpen] = useState(false);
   const [number, setNumber] = useState("");
   const [desc, setDesc] = useState("");
-
-  function handleAdd() {
-    if (number === "" && desc === "") return;
-
-    const dataFin = {
-      key: number,
-      numberTask: number,
-      descText: desc,
-    };
-
-    setTask([...task, dataFin]);
-    setOpen(false);
-    setNumber("");
-  }
 
   return (
     <View>
@@ -38,7 +24,7 @@ export default function TaskListFin({ dataFin, dataDesc }) {
         style={styles.containerTask}
         onPress={() => setOpen(true)}
       >
-        <Text style={styles.taskText}>Patrimônio {dataFin.numberTask} </Text>
+        <Text style={styles.taskText}>Patrimônio {data.numberTask} </Text>
       </TouchableOpacity>
       <Modal animationType="slide" transparent={false} visible={open}>
         <View style={styles.container}>
@@ -60,8 +46,8 @@ export default function TaskListFin({ dataFin, dataDesc }) {
               placeholder="Número do Patrimônio"
               placeholderTextColor={"#7C7C8A"}
               style={styles.inputText}
-              value={`Patrimônio ${dataFin.numberTask}`}
-              onChangeText={(texto) => Finalizacao.setNumber(texto)}
+              value={`Patrimônio ${data.numberTask}`}
+              onChangeText={() => {}}
             />
           </View>
           <View style={[styles.inputContainerDesc, styles.desc]}>
@@ -74,7 +60,7 @@ export default function TaskListFin({ dataFin, dataDesc }) {
               style={styles.inputText}
               placeholder="Descrição do problema"
               placeholderTextColor={"#7C7C8A"}
-              value={dataFin.descText}
+              value={data.descText}
             />
           </View>
           <View style={styles.inputContainerDesc}>
@@ -89,10 +75,7 @@ export default function TaskListFin({ dataFin, dataDesc }) {
             />
           </View>
           <View>
-            <TouchableOpacity
-              style={styles.buttonContainer}
-              onPress={() => navigation.navigate("Finalizacao")}
-            >
+            <TouchableOpacity style={styles.buttonContainer} onPress={() => {}}>
               <Text style={styles.buttonRequest}>Finalizar</Text>
             </TouchableOpacity>
           </View>
@@ -121,14 +104,6 @@ export default function TaskListFin({ dataFin, dataDesc }) {
                 FINALIZADOS
               </Text>
             </TouchableOpacity>
-          </View>
-          <View>
-            <FlatList
-              showsHorizontalScrollIndicator={false}
-              data={taskFin}
-              keyExtractor={(item) => String(item.key)}
-              renderItem={({ item }) => <TaskListFin dataFin={item} number />}
-            />
           </View>
 
           <Modal animationType="slide" transparent={false} visible={open}>
@@ -162,7 +137,7 @@ export default function TaskListFin({ dataFin, dataDesc }) {
               </View>
               <View>
                 <TouchableOpacity
-                  onPress={handleAddFin}
+                  onPress={handleAdd}
                   style={styles.buttonContainer}
                 >
                   <Text style={styles.buttonRequest}>Nova solitação</Text>

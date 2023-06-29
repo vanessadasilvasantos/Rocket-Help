@@ -12,8 +12,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import TaskList from "../TaskList";
-import Finalizacao from "../finalizacao";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
+//import TaskListFin from "../TaskListFin";
 
 export default function Home() {
   const navigation = useNavigation();
@@ -21,6 +22,8 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [number, setNumber] = useState("");
   const [desc, setDesc] = useState("");
+  const [page, setPage] = useState("andamentos");
+  const [taskFin, setTaskFin] = useState([]);
 
   useEffect(() => {
     async function loadTasks() {
@@ -56,12 +59,14 @@ export default function Home() {
     setNumber("");
   }
 
+  const condicao = page === "andamentos";
+
   const handleDelete = useCallback((data) => {
     const find = task.filter((r) => r.key !== data.key);
     setTask(find);
-
-    handleAdd();
   });
+
+  function changeStatus(item) {}
 
   return (
     <View style={styles.container}>
@@ -73,16 +78,17 @@ export default function Home() {
       </View>
       <Text style={styles.textTitle}>Solicitações</Text>
       <View style={styles.containerButtons}>
-        <TouchableOpacity style={[styles.buttons, styles.buttonsActive]}>
+        <TouchableOpacity
+          style={[styles.buttons, styles.buttonsActive]}
+          onPress={() => setPage("andamentos")}
+        >
           <Text style={[styles.buttonsText, styles.buttonsTextActive]}>
             EM ANDAMENTO
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttons}
-          onPress={() => {
-            navigation.navigate("Finalizacao");
-          }}
+          onPress={() => setPage("finalizados")}
         >
           <Text style={styles.buttonsText}>FINALIZADOS</Text>
         </TouchableOpacity>
@@ -91,17 +97,22 @@ export default function Home() {
         style={styles.buttonRequestContainer}
         onPress={() => setOpen(true)}
       >
-        <Text style={styles.buttonRequest}>Nova solitação</Text>
+        <Text style={styles.buttonRequest}>Nova Solitação</Text>
       </TouchableOpacity>
+
       <View>
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          data={task}
-          keyExtractor={(item) => String(item.key)}
-          renderItem={({ item }) => (
-            <TaskList data={item} number handleDelete={handleDelete} />
-          )}
-        />
+        {condicao ? (
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            data={task}
+            keyExtractor={(item) => String(item.key)}
+            renderItem={({ item }) => (
+              <TaskList data={item} handleDelete={handleDelete} />
+            )}
+          />
+        ) : (
+          <Text>teste finalizado</Text>
+        )}
       </View>
 
       <Modal animationType="slide" transparent={false} visible={open}>

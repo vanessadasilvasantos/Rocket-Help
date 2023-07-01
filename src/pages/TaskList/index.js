@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Text,
   View,
@@ -9,12 +9,15 @@ import {
   TextInput,
 } from "react-native";
 import Home from "../home";
+import moment from "moment";
+import { StateProvider, StateContext } from "../../state";
 
 import { useNavigation } from "@react-navigation/native";
 
-export default function TaskList({ data, dataDesc, handleDelete }) {
+export default function TaskList({ data, handleDelete, setNumber }) {
   const navigation = useNavigation();
   const [open, setOpen] = useState(false);
+  const { solucao, setSolucao } = React.useContext(StateContext);
 
   return (
     <View>
@@ -28,7 +31,9 @@ export default function TaskList({ data, dataDesc, handleDelete }) {
         </View>
         <View style={styles.taskTempoContainer}>
           <Image source={require("../../../img/relo.png")} />
-          <Text style={styles.taskTextTime}>20/01/22 ás 14h</Text>
+          <Text style={styles.taskTextTime}>
+            {moment().format("DD/MM/YY [ás] HH:mm")}
+          </Text>
         </View>
       </TouchableOpacity>
       <Modal animationType="slide" transparent={false} visible={open}>
@@ -52,7 +57,7 @@ export default function TaskList({ data, dataDesc, handleDelete }) {
               placeholderTextColor={"#7C7C8A"}
               style={styles.inputText}
               value={`Patrimônio ${data.numberTask}`}
-              onChangeText={(texto) => Home.setNumber(texto)}
+              onChangeText={(texto) => setNumber(texto)}
             />
           </View>
           <View style={[styles.inputContainerDesc, styles.desc]}>
@@ -66,7 +71,6 @@ export default function TaskList({ data, dataDesc, handleDelete }) {
               placeholder="Descrição do problema"
               placeholderTextColor={"#7C7C8A"}
               value={data.descText}
-              //  onChangeText={(texto) => Home.setDesc(texto)}
             />
           </View>
           <View style={styles.inputContainerDesc}>
@@ -76,12 +80,19 @@ export default function TaskList({ data, dataDesc, handleDelete }) {
             </View>
             <TextInput
               multiline={true}
+              placeholder="Descrição da solução"
               style={styles.inputText}
+              onChangeText={(texto) => setSolucao(texto)}
               placeholderTextColor={"#7C7C8A"}
             />
           </View>
           <View>
-            <TouchableOpacity style={styles.buttonContainer} onPress={() => {}}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={() => {
+                handleDelete(data);
+              }}
+            >
               <Text style={styles.buttonRequest}>Finalizar</Text>
             </TouchableOpacity>
           </View>

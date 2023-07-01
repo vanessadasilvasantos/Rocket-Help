@@ -8,15 +8,14 @@ import {
   Image,
   TextInput,
 } from "react-native";
+import { StateContext } from "../../state";
 
 import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
 
-export default function TaskListFin({ data, dataDesc }) {
-  const navigation = useNavigation();
-  const [task, setTask] = useState([]);
+export default function TaskListFin({ data }) {
   const [open, setOpen] = useState(false);
-  const [number, setNumber] = useState("");
-  const [desc, setDesc] = useState("");
+  const { solucao, setSolucao } = React.useContext(StateContext);
 
   return (
     <View>
@@ -24,7 +23,16 @@ export default function TaskListFin({ data, dataDesc }) {
         style={styles.containerTask}
         onPress={() => setOpen(true)}
       >
-        <Text style={styles.taskText}>Patrimônio {data.numberTask} </Text>
+        <View style={styles.taskContainerStyle}>
+          <Text style={styles.taskText}>Patrimônio {data.numberTask} </Text>
+          <Image source={require("../../../img/fin.png")} />
+        </View>
+        <View style={styles.taskTempoContainer}>
+          <Image source={require("../../../img/relo.png")} />
+          <Text style={styles.taskTextTime}>
+            {moment().format("DD/MM/YY [ás] HH:mm")}
+          </Text>
+        </View>
       </TouchableOpacity>
       <Modal animationType="slide" transparent={false} visible={open}>
         <View style={styles.container}>
@@ -62,6 +70,9 @@ export default function TaskListFin({ data, dataDesc }) {
               placeholderTextColor={"#7C7C8A"}
               value={data.descText}
             />
+            <Text style={[styles.textLabel, styles.textLabelMomentDesc]}>
+              {moment().format("DD/MM/YY [ás] HH:mm")}
+            </Text>
           </View>
           <View style={styles.inputContainerDesc}>
             <View style={styles.label}>
@@ -70,81 +81,15 @@ export default function TaskListFin({ data, dataDesc }) {
             </View>
             <TextInput
               multiline={true}
+              placeholder="Descrição da solução"
               style={styles.inputText}
+              value={solucao}
               placeholderTextColor={"#7C7C8A"}
             />
+            <Text style={[styles.textLabel, styles.textLabelMoment]}>
+              {moment().format("DD/MM/YY [ás] HH:mm")}
+            </Text>
           </View>
-          <View>
-            <TouchableOpacity style={styles.buttonContainer} onPress={() => {}}>
-              <Text style={styles.buttonRequest}>Finalizar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      <Modal animationType="slide" transparent={false} visible={open}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Image source={require("../../../img/logo2.png")} />
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Image source={require("../../../img/login.png")} />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.textTitle}>Solicitações</Text>
-          <View style={styles.containerButtons}>
-            <TouchableOpacity
-              style={styles.buttons}
-              onPress={() => {
-                navigation.navigate("Home");
-              }}
-            >
-              <Text style={styles.buttonsText}>EM ANDAMENTO</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.buttons, styles.buttonsActive]}>
-              <Text style={[styles.buttonsText, styles.buttonsTextActive]}>
-                FINALIZADOS
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Modal animationType="slide" transparent={false} visible={open}>
-            <View style={styles.containerModal}>
-              <View style={styles.titleModal}>
-                <TouchableOpacity onPress={() => setOpen(false)}>
-                  <Image
-                    source={require("../../../img/seta.png")}
-                    style={styles.iconModal}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.textModal}>Solitação</Text>
-              </View>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholder="Número do Patrimônio"
-                  placeholderTextColor={"#7C7C8A"}
-                  style={styles.inputText}
-                  value={number}
-                  onChangeText={(texto) => setNumber(texto)}
-                />
-              </View>
-              <View style={styles.inputContainerDesc}>
-                <TextInput
-                  multiline={true}
-                  placeholder="Descrição do problema"
-                  placeholderTextColor={"#7C7C8A"}
-                  style={styles.inputText}
-                  onChangeText={(texto) => setDesc(texto)}
-                />
-              </View>
-              <View>
-                <TouchableOpacity
-                  onPress={handleAdd}
-                  style={styles.buttonContainer}
-                >
-                  <Text style={styles.buttonRequest}>Nova solitação</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
         </View>
       </Modal>
     </View>
@@ -244,5 +189,30 @@ const styles = StyleSheet.create({
   },
   desc: {
     height: "22%",
+  },
+  taskContainerStyle: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginRight: 20,
+    alignItems: "center",
+  },
+  taskTempoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginHorizontal: 30,
+    marginTop: 5,
+  },
+  taskTextTime: {
+    color: "#C4C4CC",
+    fontSize: 8,
+  },
+  textLabelMoment: {
+    marginLeft: 15,
+    marginTop: "45%",
+  },
+  textLabelMomentDesc: {
+    marginLeft: 15,
+    marginTop: "20%",
   },
 });

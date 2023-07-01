@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState, useCallback } from "react";
+import moment from "moment";
 import {
   StyleSheet,
   Text,
@@ -14,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import TaskList from "../TaskList";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-//import TaskListFin from "../TaskListFin";
+import TaskListFin from "../TaskListFin";
 
 export default function Home() {
   const navigation = useNavigation();
@@ -45,6 +46,26 @@ export default function Home() {
     saveTasks();
   }, [task]);
 
+  useEffect(() => {
+    async function loadTasksFin() {
+      const taskStorage = await AsyncStorage.getItem("@taskFin");
+
+      if (taskStorage) {
+        setTaskFin(JSON.parse(taskStorage));
+      }
+    }
+
+    loadTasksFin();
+  }, []);
+
+  useEffect(() => {
+    async function saveTasksFin() {
+      await AsyncStorage.setItem("@taskFin", JSON.stringify(taskFin));
+    }
+
+    saveTasksFin();
+  }, [taskFin]);
+
   function handleAdd() {
     if (number === "" && desc === "") return;
 
@@ -60,13 +81,15 @@ export default function Home() {
   }
 
   const condicao = page === "andamentos";
+  const noCalls = task.length !== 0 && taskFin.length !== 0;
+  const noCallsFin = taskFin.length !== 0;
 
   const handleDelete = useCallback((data) => {
+    setTaskFin([...taskFin, data]);
+
     const find = task.filter((r) => r.key !== data.key);
     setTask(find);
   });
-
-  function changeStatus(item) {}
 
   return (
     <View style={styles.container}>
@@ -76,21 +99,40 @@ export default function Home() {
           <Image source={require("../../../img/login.png")} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.textTitle}>Solicitações</Text>
+      <View style={styles.containerTitle}>
+        <Text style={styles.textTitle}>Solicitações</Text>
+        {condicao ? (
+          <Text style={styles.textTitle}>{task.length}</Text>
+        ) : (
+          <Text style={styles.textTitle}>{taskFin.length}</Text>
+        )}
+      </View>
       <View style={styles.containerButtons}>
         <TouchableOpacity
-          style={[styles.buttons, styles.buttonsActive]}
+          style={[styles.buttons, condicao ? styles.buttonsActive : null]}
           onPress={() => setPage("andamentos")}
         >
-          <Text style={[styles.buttonsText, styles.buttonsTextActive]}>
+          <Text
+            style={[
+              styles.buttonsText,
+              condicao ? styles.buttonsTextActive : null,
+            ]}
+          >
             EM ANDAMENTO
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.buttons}
+          style={[styles.buttons, !condicao ? styles.buttonsActiveFin : null]}
           onPress={() => setPage("finalizados")}
         >
-          <Text style={styles.buttonsText}>FINALIZADOS</Text>
+          <Text
+            style={[
+              styles.buttonsText,
+              !condicao ? styles.buttonsTextActiveFin : null,
+            ]}
+          >
+            FINALIZADOS
+          </Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
@@ -107,13 +149,36 @@ export default function Home() {
             data={task}
             keyExtractor={(item) => String(item.key)}
             renderItem={({ item }) => (
-              <TaskList data={item} handleDelete={handleDelete} />
+              <TaskList
+                data={item}
+                //currentTimeString={currentTime}
+                setNumber={setNumber}
+                handleDelete={handleDelete}
+              />
             )}
           />
         ) : (
-          <Text>teste finalizado</Text>
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            data={taskFin}
+            keyExtractor={(item) => String(item.key)}
+            renderItem={({ item }) => (
+              <TaskListFin data={item} handleDelete={handleDelete} />
+            )}
+          />
         )}
       </View>
+      {!noCalls && condicao ? (
+        <View style={styles.msgContainer}>
+          <Image
+            source={require("../../../img/msg.png")}
+            style={styles.imgMsg}
+          />
+          <Text style={styles.textMsg}>
+            Você ainda não tem{"\n"} chamados criados
+          </Text>
+        </View>
+      ) : null}
 
       <Modal animationType="slide" transparent={false} visible={open}>
         <View style={styles.containerModal}>
@@ -175,7 +240,7 @@ const styles = StyleSheet.create({
   textTitle: {
     fontSize: 15,
     color: "#E1E1E6",
-    marginLeft: 20,
+    marginHorizontal: 20,
     marginTop: 30,
     fontWeight: 700,
   },
@@ -195,6 +260,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FBA94C",
   },
+  buttonsActiveFin: {
+    borderWidth: 1,
+    borderColor: "#04D361",
+  },
   buttonsText: {
     color: "#7C7C8A",
     fontSize: 8,
@@ -202,6 +271,9 @@ const styles = StyleSheet.create({
   },
   buttonsTextActive: {
     color: "#FBA94C",
+  },
+  buttonsTextActiveFin: {
+    color: "#04D361",
   },
   buttonRequestContainer: {
     position: "absolute",
@@ -265,4 +337,19 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#00875F",
   },
+  containerTitle: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  msgContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 25,
+  },
+  textMsg: {
+    color: "#7C7C8A",
+    fontSize: 18,
+    marginTop: 15,
+  },
+  imgMsg: {},
 });
